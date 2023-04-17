@@ -28,6 +28,8 @@ old_owner_namespace = args.old_owner_namespace
 new_owner_user_name = args.new_owner_user_name
 new_owner_namespace = args.new_owner_namespace
 
+old_user_arn = f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
+
 def get_permissions(id, asset_type):
     if asset_type == 'theme':
         permissions_response = qs_client.describe_theme_permissions(
@@ -35,7 +37,7 @@ def get_permissions(id, asset_type):
             ThemeId=id
         )
         # if there is a DeleteTheme action, then the user is an owner
-        if 'DeleteTheme' in permissions_response['Permissions'][0]['Actions']:
+        if 'quicksight:DeleteTheme' in permissions_response['Permissions'][0]['Actions']:
             return permissions_response['Permissions'][0]['Actions']
         
     elif asset_type == 'template':
@@ -44,7 +46,7 @@ def get_permissions(id, asset_type):
             TemplateId=id
         )
         # if there is a DeleteTemplate action, then the user is an owner
-        if 'DeleteTemplate' in permissions_response['Permissions'][0]['Actions']:
+        if 'quicksight:DeleteTemplate' in permissions_response['Permissions'][0]['Actions']:
             return permissions_response['Permissions'][0]['Actions']
     
 
@@ -56,7 +58,7 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
             {
                 'Name': 'QUICKSIGHT_OWNER',
                 'Operator': 'StringEquals',
-                'Value': f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
+                'Value': old_user_arn
                 }
             ]
         )
@@ -73,16 +75,9 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
         permissions = describe_permissions_response['Permissions']
         
         if len(permissions) == 1:
-            if len(permissions[0]['Principal'].split('/')) == 3:
-                asset_owner = permissions[0]['Principal'].split('/')[-1]
-                dashboard_owner_actions = permissions[0]['Actions']
-            else:
-                asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-                dashboard_owner_actions = permissions[0]['Actions']
-        
-        
             # check if the user to be deleted is the only owner of the dashboard
-            if asset_owner == old_owner_user_name:
+            if permissions[0]['Principal'] == old_user_arn:
+                dashboard_owner_actions = permissions[0]['Actions']
                 qs_client.update_dashboard_permissions(
                     AwsAccountId=account_id,
                     DashboardId=dashboard_id,
@@ -122,15 +117,9 @@ def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_n
         permissions = describe_permissions_response['Permissions']
         
         if len(permissions) == 1:
-            if len(permissions[0]['Principal'].split('/')) == 3:
-                asset_owner = permissions[0]['Principal'].split('/')[-1]
-                analysis_owner_actions = permissions[0]['Actions']
-            else:
-                asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-                analysis_owner_actions = permissions[0]['Actions']
-        
             # check if the user to be deleted is the only owner of the analysis
-            if asset_owner == old_owner_user_name:
+            if permissions[0]['Principal'] == old_user_arn:
+                analysis_owner_actions = permissions[0]['Actions']
                 qs_client.update_analysis_permissions(
                     AwsAccountId=account_id,
                     AnalysisId=analysis_id,
@@ -169,15 +158,9 @@ def add_new_data_set_ownership(account_id, new_owner_namespace, new_owner_user_n
         permissions = describe_permissions_response['Permissions']
         
         if len(permissions) == 1:
-            if len(permissions[0]['Principal'].split('/')) == 3:
-                asset_owner = permissions[0]['Principal'].split('/')[-1]
-                data_set_owner_actions = permissions[0]['Actions']
-            else:
-                asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-                data_set_owner_actions = permissions[0]['Actions']
-        
             # check if the user to be deleted is the only owner of the analysis
-            if asset_owner == old_owner_user_name:
+            if permissions[0]['Principal'] == old_user_arn:
+                data_set_owner_actions = permissions[0]['Actions']
                 qs_client.update_data_set_permissions(
                     AwsAccountId=account_id,
                     DataSetId=data_set_id,
@@ -212,14 +195,9 @@ def add_new_theme_ownership(account_id, new_owner_namespace, new_owner_user_name
             permissions = describe_permissions_response['Permissions']
 
             if len(permissions) == 1:
-                if len(permissions[0]['Principal'].split('/')) == 3:
-                    asset_owner = permissions[0]['Principal'].split('/')[-1]
-                else:
-                    asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-            
                 # check if the user to be deleted is the only owner of the analysis
-                if asset_owner == old_owner_user_name:
-                    permissions_list = get_permissions(theme_id, theme)
+                if permissions[0]['Principal'] == old_user_arn:
+                    permissions_list = get_permissions(theme_id, 'theme')
                     if permissions_list:
                         qs_client.update_theme_permissions(
                             AwsAccountId=account_id,
@@ -254,14 +232,9 @@ def add_new_template_ownership(account_id, new_owner_namespace, new_owner_user_n
         permissions = describe_permissions_response['Permissions']
 
         if len(permissions) == 1:
-            if len(permissions[0]['Principal'].split('/')) == 3:
-                asset_owner = permissions[0]['Principal'].split('/')[-1]
-            else:
-                asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-        
             # check if the user to be deleted is the only owner of the analysis
-            if asset_owner == old_owner_user_name:
-                permissions_list = get_permissions(template_id, template)
+            if permissions[0]['Principal'] == old_user_arn:
+                permissions_list = get_permissions(template_id, 'template')
                 if permissions_list:
                     qs_client.update_template_permissions(
                         AwsAccountId=account_id,
@@ -303,16 +276,9 @@ def add_new_data_source_ownership(account_id, new_owner_namespace, new_owner_use
         permissions = describe_permissions_response['Permissions']
 
         if len(permissions) == 1:
-            if len(permissions[0]['Principal'].split('/')) == 3:
-                asset_owner = permissions[0]['Principal'].split('/')[-1]
-                data_source_owner_actions = permissions[0]['Actions']
-            else:
-                asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-                data_source_owner_actions = permissions[0]['Actions']
-
-
             # check if the user to be deleted is the only owner of the analysis
-            if asset_owner == old_owner_user_name:
+            if permissions[0]['Principal'] == old_user_arn:
+                data_source_owner_actions = permissions[0]['Actions']
                 qs_client.update_data_source_permissions(
                     AwsAccountId=account_id,
                     DataSourceId=data_source_id,
@@ -323,7 +289,7 @@ def add_new_data_source_ownership(account_id, new_owner_namespace, new_owner_use
                             }
                         ]
                     )
-
+                    
                 print(f"Transferring ownership of data source {data_source_id} to user {new_owner_user_name}")
 
               
@@ -354,15 +320,9 @@ def add_new_folder_ownership(account_id, new_owner_namespace, new_owner_user_nam
         permissions = describe_permissions_response['Permissions']
 
         if len(permissions) == 1:
-            if len(permissions[0]['Principal'].split('/')) == 3:
-                asset_owner = permissions[0]['Principal'].split('/')[-1]
-                folder_owner_actions = permissions[0]['Actions']
-            else:
-                asset_owner = f"{permissions[0]['Principal'].split('/')[-2]}/{permissions[0]['Principal'].split('/')[-1]}"
-                folder_owner_actions = permissions[0]['Actions']
-        
             # check if the user to be deleted is the only owner of the analysis
-            if asset_owner == old_owner_user_name:
+            if permissions[0]['Principal'] == old_user_arn:
+                folder_owner_actions = permissions[0]['Actions']
                 qs_client.update_folder_permissions(
                     AwsAccountId=account_id,
                     FolderId=folder_id,
