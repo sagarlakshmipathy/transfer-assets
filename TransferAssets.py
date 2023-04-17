@@ -39,7 +39,7 @@ def get_permissions(id, asset_type):
         # if there is a DeleteTheme action, then the user is an owner
         if 'quicksight:DeleteTheme' in permissions_response['Permissions'][0]['Actions']:
             return permissions_response['Permissions'][0]['Actions']
-        
+
     elif asset_type == 'template':
         permissions_response = qs_client.describe_template_permissions(
             AwsAccountId=account_id,
@@ -48,7 +48,7 @@ def get_permissions(id, asset_type):
         # if there is a DeleteTemplate action, then the user is an owner
         if 'quicksight:DeleteTemplate' in permissions_response['Permissions'][0]['Actions']:
             return permissions_response['Permissions'][0]['Actions']
-    
+
 
 def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_name):
     # Retrieve a list of all dashboards in your QuickSight account
@@ -56,24 +56,24 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
         AwsAccountId=account_id,
         Filters=[
             {
-                'Name': 'DIRECT_QUICKSIGHT_SOLE_OWNER',
-                'Operator': 'StringEquals',
-                'Value': old_user_arn
+                "Name": "DIRECT_QUICKSIGHT_SOLE_OWNER",
+                "Operator": "StringEquals",
+                "Value": old_user_arn
                 }
             ]
         )
-    
+
     # Loop through each dashboard
     for dashboard in search_dashboards_response['DashboardSummaryList']:
         dashboard_id = dashboard['DashboardId']
-        
+
         # Retrieve a list of permissions for the dashboard
         describe_permissions_response = qs_client.describe_dashboard_permissions(
             DashboardId=dashboard_id,
             AwsAccountId=account_id
         )
         permissions = describe_permissions_response['Permissions']
-        
+
         if len(permissions) == 1:
             # check if the user to be deleted is the only owner of the dashboard
             if permissions[0]['Principal'] == old_user_arn:
@@ -94,19 +94,19 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
                             }
                         ]
                     )
-                
+
                 print(f"Transferring ownership of dashboard {dashboard_id} to user {new_owner_user_name}")
 
 
 def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_name):
-    
+
     search_analyses_response = qs_client.search_analyses(
         AwsAccountId=account_id,
         Filters=[
             {
-                'Name': 'DIRECT_QUICKSIGHT_SOLE_OWNER',
-                'Operator': 'StringEquals',
-                'Value': f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
+                "Name": "DIRECT_QUICKSIGHT_SOLE_OWNER",
+                "Operator": "StringEquals",
+                "Value": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
                 }
             ]
         )
@@ -114,14 +114,14 @@ def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_n
     # loop through each analysis
     for analysis in search_analyses_response['AnalysisSummaryList']:
         analysis_id = analysis['AnalysisId']
-        
+
         # Retrieve a list of permissions for the analysis
         describe_permissions_response = qs_client.describe_analysis_permissions(
             AnalysisId=analysis_id,
             AwsAccountId=account_id
         )
         permissions = describe_permissions_response['Permissions']
-        
+
         if len(permissions) == 1:
             # check if the user to be deleted is the only owner of the analysis
             if permissions[0]['Principal'] == old_user_arn:
@@ -142,7 +142,7 @@ def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_n
                             }
                         ]
                     )
-                
+
                 print(f"Transferring ownership of analysis {analysis_id} to user {new_owner_user_name}")
 
 
@@ -152,23 +152,23 @@ def add_new_data_set_ownership(account_id, new_owner_namespace, new_owner_user_n
         AwsAccountId=account_id,
         Filters=[
             {
-                'Name': 'QUICKSIGHT_OWNER',
-                'Operator': 'StringEquals',
-                'Value': f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
+                "Name": "QUICKSIGHT_OWNER",
+                "Operator": "StringEquals",
+                "Value": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
                 }
             ]
         )
     # loop through each dataset
     for data_set in search_data_sets_response['DataSetSummaries']:
         data_set_id = data_set['DataSetId']
-        
+
         # Retrieve a list of permissions for the dataset
         describe_permissions_response = qs_client.describe_data_set_permissions(
             DataSetId=data_set_id,
             AwsAccountId=account_id
         )
         permissions = describe_permissions_response['Permissions']
-        
+
         if len(permissions) == 1:
             # check if the user to be deleted is the only owner of the analysis
             if permissions[0]['Principal'] == old_user_arn:
@@ -179,17 +179,17 @@ def add_new_data_set_ownership(account_id, new_owner_namespace, new_owner_user_n
                     GrantPermissions=[
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
-                            'Actions': data_set_owner_actions
+                            "Actions": data_set_owner_actions
                             }
                         ],
                     RevokePermissions=[
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                            'Actions': data_set_owner_actions
+                            "Actions": data_set_owner_actions
                             }
                         ]
                     )
-                    
+
                 print(f"Transferring ownership of dataset {data_set_id} to user {new_owner_user_name}")
 
 
@@ -206,7 +206,7 @@ def add_new_theme_ownership(account_id, new_owner_namespace, new_owner_user_name
         # Retrieve a list of permissions for the theme for all themese except default ones
         if theme_id not in ['CLASSIC', 'MIDNIGHT', 'SEASIDE', 'RAINIER']:
             describe_permissions_response = qs_client.describe_theme_permissions(
-                ThemeId=theme_id,    
+                ThemeId=theme_id,
                 AwsAccountId=account_id
                 )
 
@@ -229,11 +229,11 @@ def add_new_theme_ownership(account_id, new_owner_namespace, new_owner_user_name
                             RevokePermissions=[
                                 {
                                     "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                                    'Actions': permissions_list
+                                    "Actions": permissions_list
                                     }
                                 ]
                             )
-                            
+
                         print(f"Transferring ownership of theme {theme_id} to user {new_owner_user_name}")
 
 
@@ -246,10 +246,10 @@ def add_new_template_ownership(account_id, new_owner_namespace, new_owner_user_n
     # loop through each template
     for template in list_templates_response['TemplateSummaryList']:
         template_id = template['TemplateId']
-        
+
         # Retrieve a list of permissions for the template
         describe_permissions_response = qs_client.describe_template_permissions(
-            TemplateId=template_id,   
+            TemplateId=template_id,
             AwsAccountId=account_id
             )
 
@@ -266,17 +266,17 @@ def add_new_template_ownership(account_id, new_owner_namespace, new_owner_user_n
                         GrantPermissions=[
                             {
                                 "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
-                                'Actions': permissions_list
+                                "Actions": permissions_list
                                 }
                             ],
                         RevokePermissions=[
                             {
                                 "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                                'Actions': permissions_list
+                                "Actions": permissions_list
                                 }
                             ]
                         )
-                        
+
                     print(f"Transferring ownership of template {template_id} to user {new_owner_user_name}")
 
 
@@ -284,11 +284,11 @@ def add_new_data_source_ownership(account_id, new_owner_namespace, new_owner_use
     # retrieve the list of data sources in your QuickSight account
     search_data_sources_response = qs_client.search_data_sources(
         AwsAccountId=account_id,
-        Filters=[   
+        Filters=[
             {
-                'Name': 'DIRECT_QUICKSIGHT_OWNER',
-                'Operator': 'StringEquals',
-                'Value': f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
+                "Name": "DIRECT_QUICKSIGHT_OWNER",
+                "Operator": "StringEquals",
+                "Value": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
                 }
             ]
         )
@@ -299,7 +299,7 @@ def add_new_data_source_ownership(account_id, new_owner_namespace, new_owner_use
 
         # Retrieve a list of permissions for the data source
         describe_permissions_response = qs_client.describe_data_source_permissions(
-            DataSourceId=data_source_id,  
+            DataSourceId=data_source_id,
             AwsAccountId=account_id
             )
 
@@ -315,33 +315,32 @@ def add_new_data_source_ownership(account_id, new_owner_namespace, new_owner_use
                     GrantPermissions=[
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
-                            'Actions': data_source_owner_actions
+                            "Actions": data_source_owner_actions
                             }
                         ],
                     RevokePermissions=[
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                            'Actions': data_source_owner_actions
+                            "Actions": data_source_owner_actions
                             }
                         ]
                     )
-                    
+
                 print(f"Transferring ownership of data source {data_source_id} to user {new_owner_user_name}")
 
-              
+
 def add_new_folder_ownership(account_id, new_owner_namespace, new_owner_user_name):
     # retrieve the list of folders in your QuickSight account
     search_folders_response = qs_client.search_folders(
         AwsAccountId=account_id,
         Filters=[
             {
-                'Name': 'QUICKSIGHT_OWNER',
-                'Operator': 'StringEquals',
-                'Value': f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
+                "Name": "QUICKSIGHT_OWNER",
+                "Operator": "StringEquals",
+                "Value": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
                 }
             ]
         )
-    
 
     # loop through each folder
     for folder in search_folders_response['FolderSummaryList']:
@@ -349,7 +348,7 @@ def add_new_folder_ownership(account_id, new_owner_namespace, new_owner_user_nam
 
         # Retrieve a list of permissions for the folder
         describe_permissions_response = qs_client.describe_folder_permissions(
-            FolderId=folder_id,  
+            FolderId=folder_id,
             AwsAccountId=account_id
             )
 
@@ -365,18 +364,17 @@ def add_new_folder_ownership(account_id, new_owner_namespace, new_owner_user_nam
                     GrantPermissions=[
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
-                            'Actions': folder_owner_actions
+                            "Actions": folder_owner_actions
                             }
                         ],
                     RevokePermissions=[
                         {
-                            
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                            'Actions': folder_owner_actions
+                            "Actions": folder_owner_actions
                             }
                         ]
                     )
-                
+
                 print(f"Transferring ownership of folder {folder_id} to user {new_owner_user_name}")
 
 
