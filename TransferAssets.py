@@ -74,28 +74,27 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
         )
         permissions = describe_permissions_response['Permissions']
 
-        if len(permissions) == 1:
-            # check if the user to be deleted is the only owner of the dashboard
-            if permissions[0]['Principal'] == old_user_arn:
-                dashboard_owner_actions = permissions[0]['Actions']
-                qs_client.update_dashboard_permissions(
-                    AwsAccountId=account_id,
-                    DashboardId=dashboard_id,
-                    GrantPermissions=[
-                        {
-                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
-                            "Actions": dashboard_owner_actions
-                            }
-                        ],
-                    RevokePermissions=[
-                        {
-                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                            "Actions": dashboard_owner_actions
-                            }
-                        ]
-                    )
+        # check if the user to be deleted is the only owner of the dashboard
+        if permissions[0]['Principal'] == old_user_arn:
+            dashboard_owner_actions = permissions[0]['Actions']
+            qs_client.update_dashboard_permissions(
+                AwsAccountId=account_id,
+                DashboardId=dashboard_id,
+                GrantPermissions=[
+                    {
+                        "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
+                        "Actions": dashboard_owner_actions
+                        }
+                    ],
+                RevokePermissions=[
+                    {
+                        "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
+                        "Actions": dashboard_owner_actions
+                        }
+                    ]
+                )
 
-                print(f"Transferring ownership of dashboard {dashboard_id} to user {new_owner_user_name}")
+            print(f"Transferring ownership of dashboard {dashboard_id} to user {new_owner_user_name}")
 
 
 def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_name):
@@ -122,28 +121,27 @@ def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_n
         )
         permissions = describe_permissions_response['Permissions']
 
-        if len(permissions) == 1:
-            # check if the user to be deleted is the only owner of the analysis
-            if permissions[0]['Principal'] == old_user_arn:
-                analysis_owner_actions = permissions[0]['Actions']
-                qs_client.update_analysis_permissions(
-                    AwsAccountId=account_id,
-                    AnalysisId=analysis_id,
-                    GrantPermissions=[
-                        {
-                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
-                            "Actions": analysis_owner_actions
-                            }
-                        ],
-                    RevokePermissions=[
-                        {
-                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
-                            "Actions": analysis_owner_actions
-                            }
-                        ]
-                    )
+        # check if the user to be deleted is the only owner of the analysis
+        if permissions[0]['Principal'] == old_user_arn:
+            analysis_owner_actions = permissions[0]['Actions']
+            qs_client.update_analysis_permissions(
+                AwsAccountId=account_id,
+                AnalysisId=analysis_id,
+                GrantPermissions=[
+                    {
+                        "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
+                        "Actions": analysis_owner_actions
+                        }
+                    ],
+                RevokePermissions=[
+                    {
+                        "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
+                        "Actions": analysis_owner_actions
+                        }
+                    ]
+                )
 
-                print(f"Transferring ownership of analysis {analysis_id} to user {new_owner_user_name}")
+            print(f"Transferring ownership of analysis {analysis_id} to user {new_owner_user_name}")
 
 
 def add_new_data_set_ownership(account_id, new_owner_namespace, new_owner_user_name):
