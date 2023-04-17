@@ -15,49 +15,49 @@ theme_id = '5c6bf0df-ac73-452e-86b3-e7dfdda811e1'
 template_id = 'Test1'
 folder_id = '1d461ea8-728b-4250-8167-c4fb8b8df368'
 
-print("\nPermissions for Data Source")
+print(f"\nPermissions for Data Source: {data_source_id}")
 parsed_data_source_permissions = json.dumps(qs_client.describe_data_source_permissions(
     AwsAccountId=account_id,
     DataSourceId=data_source_id
     )['Permissions'], indent=4, default=str)
 print(parsed_data_source_permissions)
 
-print("\nPermissions for DataSet")
+print(f"\nPermissions for DataSet: {data_set_id}")
 parsed_data_set_permissions = json.dumps(qs_client.describe_data_set_permissions(
     AwsAccountId=account_id,
     DataSetId=data_set_id
     )['Permissions'], indent=4, default=str)
 print(parsed_data_set_permissions)
 
-print("\nPermissions for Dashboard")
+print(f"\nPermissions for Dashboard: {dashboard_id}")
 parsed_dashboard_permissions = json.dumps(qs_client.describe_dashboard_permissions(
     AwsAccountId=account_id,
     DashboardId=dashboard_id
     )['Permissions'], indent=4, default=str)
 print(parsed_dashboard_permissions)
 
-print("\nPermissions for Template")
+print(f"\nPermissions for Template: {template_id}")
 parsed_template_permissions = json.dumps(qs_client.describe_template_permissions(
     AwsAccountId=account_id,
     TemplateId=template_id
     )['Permissions'], indent=4, default=str)
 print(parsed_template_permissions)
 
-print("\nPermissions for Theme")
+print(f"\nPermissions for Theme: {theme_id}")
 parsed_theme_permissions = json.dumps(qs_client.describe_theme_permissions(
     AwsAccountId=account_id,
     ThemeId=theme_id
     )['Permissions'], indent=4, default=str)
 print(parsed_theme_permissions)
 
-print("\nPermissions for Analysis")
+print(f"\nPermissions for Analysis: {analysis_id}")
 parsed_analysis_permissions = json.dumps(qs_client.describe_analysis_permissions(
     AwsAccountId=account_id,
     AnalysisId=analysis_id
     )['Permissions'], indent=4, default=str)
 print(parsed_analysis_permissions)
 
-print("\nPermissions for Folder")
+print(f"\nPermissions for Folder: {folder_id}")
 parsed_folder_permissions = json.dumps(qs_client.describe_folder_permissions(
     AwsAccountId=account_id,
     FolderId=folder_id

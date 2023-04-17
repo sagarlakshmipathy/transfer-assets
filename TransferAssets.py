@@ -56,7 +56,7 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
         AwsAccountId=account_id,
         Filters=[
             {
-                'Name': 'QUICKSIGHT_OWNER',
+                'Name': 'DIRECT_QUICKSIGHT_SOLE_OWNER',
                 'Operator': 'StringEquals',
                 'Value': old_user_arn
                 }
@@ -85,9 +85,15 @@ def add_new_dashboard_ownership(account_id, new_owner_namespace, new_owner_user_
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
                             "Actions": dashboard_owner_actions
-                        }
-                    ]
-                )
+                            }
+                        ],
+                    RevokePermissions=[
+                        {
+                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
+                            "Actions": dashboard_owner_actions
+                            }
+                        ]
+                    )
                 
                 print(f"Transferring ownership of dashboard {dashboard_id} to user {new_owner_user_name}")
 
@@ -98,7 +104,7 @@ def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_n
         AwsAccountId=account_id,
         Filters=[
             {
-                'Name': 'QUICKSIGHT_OWNER',
+                'Name': 'DIRECT_QUICKSIGHT_SOLE_OWNER',
                 'Operator': 'StringEquals',
                 'Value': f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}"
                 }
@@ -127,9 +133,15 @@ def add_new_analysis_ownership(account_id, new_owner_namespace, new_owner_user_n
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
                             "Actions": analysis_owner_actions
-                        }
-                    ]
-                )
+                            }
+                        ],
+                    RevokePermissions=[
+                        {
+                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
+                            "Actions": analysis_owner_actions
+                            }
+                        ]
+                    )
                 
                 print(f"Transferring ownership of analysis {analysis_id} to user {new_owner_user_name}")
 
@@ -169,6 +181,12 @@ def add_new_data_set_ownership(account_id, new_owner_namespace, new_owner_user_n
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
                             'Actions': data_set_owner_actions
                             }
+                        ],
+                    RevokePermissions=[
+                        {
+                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
+                            'Actions': data_set_owner_actions
+                            }
                         ]
                     )
                     
@@ -205,6 +223,12 @@ def add_new_theme_ownership(account_id, new_owner_namespace, new_owner_user_name
                             GrantPermissions=[
                                 {
                                     "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
+                                    "Actions": permissions_list
+                                    }
+                                ],
+                            RevokePermissions=[
+                                {
+                                    "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
                                     'Actions': permissions_list
                                     }
                                 ]
@@ -242,6 +266,12 @@ def add_new_template_ownership(account_id, new_owner_namespace, new_owner_user_n
                         GrantPermissions=[
                             {
                                 "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
+                                'Actions': permissions_list
+                                }
+                            ],
+                        RevokePermissions=[
+                            {
+                                "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
                                 'Actions': permissions_list
                                 }
                             ]
@@ -285,6 +315,12 @@ def add_new_data_source_ownership(account_id, new_owner_namespace, new_owner_use
                     GrantPermissions=[
                         {
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
+                            'Actions': data_source_owner_actions
+                            }
+                        ],
+                    RevokePermissions=[
+                        {
+                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
                             'Actions': data_source_owner_actions
                             }
                         ]
@@ -331,9 +367,16 @@ def add_new_folder_ownership(account_id, new_owner_namespace, new_owner_user_nam
                             "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{new_owner_namespace}/{new_owner_user_name}",
                             'Actions': folder_owner_actions
                             }
+                        ],
+                    RevokePermissions=[
+                        {
+                            
+                            "Principal": f"arn:aws:quicksight:us-east-1:{account_id}:user/{old_owner_namespace}/{old_owner_user_name}",
+                            'Actions': folder_owner_actions
+                            }
                         ]
                     )
-
+                
                 print(f"Transferring ownership of folder {folder_id} to user {new_owner_user_name}")
 
 
@@ -344,6 +387,7 @@ def remove_user(account_id, old_owner_user_name, old_owner_user_namespace):
         UserName=old_owner_user_name,
         Namespace=old_owner_user_namespace
         )
+    print(f"Deleted user {old_owner_user_name} in {old_owner_user_namespace} namespace")
 
 
 # function calls to transfer ownership of assets
