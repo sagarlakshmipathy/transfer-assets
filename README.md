@@ -32,7 +32,7 @@ Note that the `--delete_user_from_quicksight` flag is optional.
 Here is an example command to transfer assets and delete the original owner:
 
 `
-python TransferAssets.py --old_owner_user_name john_doe --old_owner_namespace default --new_owner_user_name jane_doe --new_owner_namespace default --assets_region us-east-1 --account_id 123456789 --delete_user_from_quicksight
+python3 TransferAssets.py --old_owner_user_name john_doe --old_owner_namespace default --new_owner_user_name jane_doe --new_owner_namespace default --assets_region us-east-1 --account_id 123456789 --delete_user_from_quicksight
 `
 
 ## License
