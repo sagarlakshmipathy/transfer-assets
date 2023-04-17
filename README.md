@@ -26,8 +26,6 @@ Here are the details of the command line arguments:
 
 `--delete_user_from_quicksight`: Specify this flag if you want to delete the original owner.
 
-`--revoke_permissions_for_old_user`: Specify this flag if you want to revoke permissions for the original owner.
-
 Note that the `--delete_user_from_quicksight` flag is optional.
 
 ## Example
