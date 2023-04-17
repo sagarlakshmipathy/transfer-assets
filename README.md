@@ -1,5 +1,5 @@
 # TransferAssets.py
-This Python program uses boto3 library to transfer ownership of QuickSight dashboards, data sets, data sources, analyses, themes, folders and templates to another owner. It also optionally deletes the original owner.
+This Python program uses `boto3` library to transfer ownership of QuickSight dashboards, data sets, data sources, analyses, themes, folders and templates to another owner provided the original owner is the sole owner of the asset. It also optionally deletes the original owner.
 ## Installation
 To run this program, you need to install the required packages listed in the `requirements.txt` file. You can install the required packages using pip:
 `
