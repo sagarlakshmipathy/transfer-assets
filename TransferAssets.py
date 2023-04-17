@@ -11,7 +11,6 @@ parser.add_argument('--new_owner_namespace', type=str, required=True, help='Spec
 parser.add_argument('--assets_region', type=str, required=True, help='Specify the region where the assets are located')
 parser.add_argument('--account_id', type=str, required=True, help='Specify the account id where the assets are located')
 parser.add_argument('--delete_user_from_quicksight', action='store_true', help='Specify if you want to delete the user')
-parser.add_argument('--revoke_permissions_for_old_user', action='store_true', help='Specify if you want to revoke permissions for the old user')
 
 args = parser.parse_args()
 
